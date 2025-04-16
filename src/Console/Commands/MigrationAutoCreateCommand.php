@@ -6,7 +6,7 @@ namespace EloquentColumn\Console\Commands;
 
 use EloquentColumn\Attributes\Models\Column;
 use EloquentColumn\Attributes\Models\Table;
-use EloquentColumn\Models\ModelBase;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -29,27 +29,30 @@ final class MigrationAutoCreateCommand extends Command
     public function handle(): void
     {
         $models = [];
-        foreach (File::allFiles(base_path('app/Models')) as $file) {
+        foreach (File::allFiles(app()->basePath('app/Models')) as $file) {
             $relativePath = $file->getRelativePathname();
-            $class = 'EloquentColumn\\Models\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
+            $class = 'App\\Models\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
-            if (class_exists($class) && is_subclass_of($class, ModelBase::class)) {
+            if (class_exists($class) && is_subclass_of($class, Model::class)) {
                 $models[] = $class;
             }
         }
 
         foreach ($models as $_model) {
             if (! class_exists($_model)) {
-                $this->error("ModelBase class $_model does not exist.");
-
+                $this->error("Model class $_model does not exist.");
                 return;
             }
 
-            /** @var ModelBase $instance */
             // @phpstan-ignore varTag.differentVariable
             $model = new $_model;
 
             $reflection = new ReflectionClass($model);
+            if (!$reflection->hasMethod('getColumnDefinitions')) {
+                $this->error("Model doesn't have HasColumnAttributes trait.");
+                return;
+            }
+
             foreach ($reflection->getAttributes(Table::class) as $attribute) {
                 $columns = collect($model->getColumnDefinitions())->map(fn (array $column) => $column['column']);
                 if (! Schema::hasTable($model->getTableName())) {
@@ -65,7 +68,7 @@ final class MigrationAutoCreateCommand extends Command
 
     // /////////////////////////////////
 
-    private function generateInitialMigration(ModelBase $model, Collection $columns): void
+    private function generateInitialMigration(Model $model, Collection $columns): void
     {
         $fields = $this->generateFields($columns);
 
@@ -98,7 +101,7 @@ MIGRATION;
         $this->info("Created migration: {$filename}");
     }
 
-    private function generateUpdateMigration(ModelBase $model, Collection $columns): void
+    private function generateUpdateMigration(Model $model, Collection $columns): void
     {
         $existingColumns = collect(Schema::getColumnListing($model->getTableName()));
 

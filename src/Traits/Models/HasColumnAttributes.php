@@ -14,7 +14,7 @@ use EloquentColumn\Attributes\Models\Relationship\HasOneThrough;
 use EloquentColumn\Attributes\Models\Relationship\Relationship;
 use EloquentColumn\Attributes\Models\Table;
 use EloquentColumn\Attributes\Models\ValidationRule;
-use EloquentColumn\Models\ModelBase;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -50,7 +50,7 @@ trait HasColumnAttributes
             foreach ($parameters[0] as $key => $parameter) {
                 if (class_exists($key)) {
                     $instance = new $key;
-                    if ($instance instanceof ModelBase) {
+                    if ($instance instanceof Model) {
                         unset($parameters[0][$key]);
                         $parameters[0][mid($instance)] = $parameter;
                     }
@@ -91,7 +91,8 @@ trait HasColumnAttributes
                 $propertyType = $property->getType()->getName();
                 if (class_exists($propertyType)) {
                     $instance = new $propertyType();
-                    if ($instance instanceof ModelBase) {
+
+                    if (is_subclass_of($instance, Model::class)) {
                         $name = $column->name ?? mid($instance);
                         $column->type = 'integer';
                     }

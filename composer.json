@@ -15,12 +15,17 @@
     "autoload": {
         "psr-4": {
             "EloquentColumn\\": "src/"
-        }
-    },
-    "autoload-dev": {
+        },
         "files": [
             "src/helpers.php"
         ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "EloquentColumn\\Providers\\EloquentColumnServiceProvider"
+            ]
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true
