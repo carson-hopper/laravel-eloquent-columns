@@ -1,0 +1,27 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "carson-hopper/laravel-eloquent-columns",
+    "description": "",
+    "keywords": [
+        "laravel"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "laravel/framework": "^11.0||^12.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "EloquentColumn\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
