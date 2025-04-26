@@ -14,7 +14,6 @@ class Model extends \Illuminate\Database\Eloquent\Model
 {
     use Conditionable;
     use HasColumnAttributes;
-    use SoftDeletes;
 
     #[Column(name: 'id', type: 'id', hidden: true)]
     protected int $_id;
@@ -24,7 +23,4 @@ class Model extends \Illuminate\Database\Eloquent\Model
 
     #[Column(name: 'updated_at', type: 'timestamp', cast: 'datetime', nullable: true)]
     protected ?Carbon $_updated_at;
-
-    #[Column(name: 'deleted_at', type: 'timestamp', hidden: true, cast: 'datetime', nullable: true)]
-    protected ?Carbon $_deleted_at;
 }
